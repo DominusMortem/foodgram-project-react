@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.db import IntegrityError
 from django.db.models import Count, Sum
-from djoser.views import TokenCreateView, UserViewSet
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -15,19 +14,24 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST
 )
 
-from foodgram.models import Tag, CountOfIngredient, Recipe, Ingredient, User, ShoppingCart, Subscribe, Favorite
+from backend.pagination import LimitPageNumberPagination
+from backend.serializers import RecipeShortReadSerializer
 from .mixins import ListRetriveViewSet
-from .pagination import LimitPageNumberPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .filters import IngredientSearchFilter, RecipeFilter
-
+from .models import (
+    Tag,
+    CountOfIngredient,
+    Recipe,
+    Ingredient,
+    ShoppingCart,
+    Favorite
+)
 from .serializers import (
     IngredientSerializer,
     RecipeReadSerializer,
     RecipeWriteSerializer,
-    RecipeShortReadSerializer,
-    TagSerializer,
-    SubscriptionSerializer,
+    TagSerializer
 )
 
 
@@ -44,83 +48,6 @@ class IngredientViewSet(ListRetriveViewSet):
     http_method_names = ('get',)
 
 
-class TokenCreateWithCheckBlockStatusView(TokenCreateView):
-    def _action(self, serializer):
-        if serializer.user.is_blocked:
-            return Response(
-                {'error': 'Аккаунт заблокирован!'},
-                status=HTTP_400_BAD_REQUEST,
-            )
-        return super()._action(serializer)
-
-
-class UserSubscribeViewSet(UserViewSet):
-    pagination_class = LimitPageNumberPagination
-    lookup_url_kwarg = 'user_id'
-
-    def get_subscribtion_serializer(self, *args, **kwargs):
-        kwargs.setdefault('context', self.get_serializer_context())
-        return SubscriptionSerializer(*args, **kwargs)
-
-    @action(detail=False, permission_classes=(IsAuthenticated,))
-    def subscriptions(self, request):
-        queryset = User.objects.filter(subscribing__user=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_subscribtion_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_subscribtion_serializer(queryset, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-    def create_subscribe(self, request, author):
-        if request.user == author:
-            return Response(
-                {'error': 'Нельзя подписаться на себя.'},
-                status=HTTP_400_BAD_REQUEST,
-            )
-        try:
-            subscribe = Subscribe.objects.create(
-                user=request.user,
-                author=author,
-            )
-        except IntegrityError:
-            return Response(
-                {'error': 'Нельзя подписаться дважды!'},
-                status=HTTP_400_BAD_REQUEST,
-            )
-        serializer = self.get_subscribtion_serializer(subscribe.author)
-        return Response(serializer.data, status=HTTP_201_CREATED)
-
-    def delete_subscribe(self, request, author):
-        try:
-            Subscribe.objects.get(user=request.user, author=author).delete()
-        except Subscribe.DoesNotExist:
-            return Response(
-                {'error': 'Нельзя отписаться от пользователя, на которого не подписан.'},
-                status=HTTP_400_BAD_REQUEST,
-            )
-        return Response(
-            status=HTTP_204_NO_CONTENT
-        )
-
-    @action(
-        methods=('post', 'delete',),
-        detail=True,
-        permission_classes=(IsAuthenticated,)
-    )
-    def subscribe(self, request, user_id=None):
-        try:
-            author = get_object_or_404(User, pk=user_id)
-        except Http404:
-            return Response(
-                {'error': 'Пользователь не найден!'},
-                status=HTTP_404_NOT_FOUND,
-            )
-        if request.method == 'POST':
-            return self.create_subscribe(request, author)
-        return self.delete_subscribe(request, author)
-
-
 class ShoppingCartViewSet(ModelViewSet):
     queryset = ShoppingCart.objects.all()
     serializer_class = RecipeShortReadSerializer
@@ -129,9 +56,7 @@ class ShoppingCartViewSet(ModelViewSet):
     @action(methods=('post', 'delete',), detail=True)
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
-        shopping_cart = (
-            ShoppingCart.objects.get_or_create(user=request.user)[0]
-        )
+        shopping_cart, *_ = ShoppingCart.objects.get_or_create(user=request.user)
         if request.method == 'DELETE':
             if not shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
                 return Response(
@@ -173,7 +98,6 @@ class RecipeViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print(serializer.initial_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         serializer = RecipeReadSerializer(
@@ -206,7 +130,7 @@ class RecipeViewSet(ModelViewSet):
             Favorite.objects.create(user=request.user, recipe=recipe)
         except IntegrityError:
             return Response(
-                {'error': 'Вы уже подписаны!'},
+                {'error': 'Уже в избранном!'},
                 status=HTTP_400_BAD_REQUEST,
             )
         serializer = RecipeShortReadSerializer(recipe)
@@ -219,7 +143,7 @@ class RecipeViewSet(ModelViewSet):
         favorite = Favorite.objects.filter(user=request.user, recipe=recipe)
         if not favorite.exists():
             return Response(
-                {'error': 'Подписки не существует!'},
+                {'error': 'Избранного не существует!'},
                 status=HTTP_400_BAD_REQUEST,
             )
         favorite.delete()
@@ -248,9 +172,9 @@ class RecipeViewSet(ModelViewSet):
                 request.user.shopping_cart.recipes.prefetch_related('ingredients')
             )
             ingredients = (
-                recipes.order_by("ingredients__ingredient__name").values(
-                    "ingredients__ingredient__name",
-                    "ingredients__ingredient__measurement_unit"
+                recipes.order_by('ingredients__ingredient__name').values(
+                    'ingredients__ingredient__name',
+                    'ingredients__ingredient__measurement_unit'
                 ).annotate(
                     total=Sum('ingredients__amount')
                 )
@@ -261,14 +185,12 @@ class RecipeViewSet(ModelViewSet):
                 status=HTTP_400_BAD_REQUEST
             )
         content = 'Список необходимых продуктов:\n'
-        i = 1
-        for ingredient in ingredients:
+        for i, ingredient in enumerate(ingredients, start=1):
             content += (
                 f'{i}) {ingredient["ingredients__ingredient__name"]} '
                 f' — {ingredient["total"]}'
                 f' {ingredient["ingredients__ingredient__measurement_unit"]}\r\n'
             )
-            i += 1
         response = HttpResponse(
             content, content_type='text/plain,charset=utf8'
         )

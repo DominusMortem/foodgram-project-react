@@ -2,21 +2,10 @@ from django.urls import include, path
 from djoser.views import TokenDestroyView
 from rest_framework.routers import DefaultRouter
 
-from .views import (
-    TagViewSet,
-    IngredientViewSet,
-    TokenCreateWithCheckBlockStatusView,
-    RecipeViewSet,
-    UserSubscribeViewSet,
-    ShoppingCartViewSet,
-)
+from .views import TokenCreateWithCheckBlockStatusView, UserSubscribeViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserSubscribeViewSet, basename='users')
-router.register(r'tags', TagViewSet, basename='tags')
-router.register(r'ingredients', IngredientViewSet, basename='ingredients')
-router.register(r'recipes', RecipeViewSet, basename='recipes')
-router.register(r'recipes', ShoppingCartViewSet, basename='shopping_cart')
 
 authorization = [
     path(
@@ -26,6 +15,8 @@ authorization = [
     ),
     path('token/logout/', TokenDestroyView.as_view(), name="logout"),
 ]
+
+app_name = 'users'
 
 urlpatterns = [
     path('auth/', include(authorization)),

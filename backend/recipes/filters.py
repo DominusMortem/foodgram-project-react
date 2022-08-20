@@ -6,7 +6,7 @@ from django_filters.rest_framework import (
     FilterSet
 )
 
-from foodgram.models import Ingredient, Recipe, ShoppingCart
+from .models import Ingredient, Recipe, ShoppingCart
 
 
 class IngredientSearchFilter(FilterSet):

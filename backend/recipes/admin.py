@@ -1,9 +1,14 @@
 from django.contrib.admin import ModelAdmin, display, register
-from django.contrib.auth.admin import UserAdmin
 from django.db.models import Count, Sum
 
-from .models import Tag, CountOfIngredient, Recipe, Ingredient, User, ShoppingCart, Subscribe, Favorite
-from .forms import CustomUserChangeForm, CustomUserCreationForm
+from .models import (
+    Tag,
+    CountOfIngredient,
+    Recipe,
+    Ingredient,
+    ShoppingCart,
+    Favorite
+)
 
 
 @register(Tag)
@@ -28,7 +33,7 @@ class CountOfIngredientAdmin(ModelAdmin):
         try:
             return obj.ingredient.measurement_unit
         except CountOfIngredient.ingredient.RelatedObjectDoesNotExist:
-            return EMPTY
+            return 'Пусто'
 
     @display(description='Количество ссылок в рецептах')
     def get_recipes_count(self, obj):
@@ -58,43 +63,6 @@ class IngredientAdmin(ModelAdmin):
 class FavoriteAdmin(ModelAdmin):
     list_display = ('user', 'recipe',)
     list_filter = ('user', 'recipe',)
-
-
-@register(User)
-class UserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
-    model = User
-    list_display = (
-        'id', 'email', 'username', 'first_name', 'last_name', 'is_blocked',
-        'is_superuser',
-    )
-    list_filter = (
-        'email', 'username', 'is_blocked', 'is_superuser',
-    )
-    fieldsets = (
-        ('Общая информация', {'fields': (
-            'email', 'username', 'first_name', 'last_name', 'password',
-        )}),
-        ('Права доступа', {'classes': ('collapse',), 'fields': ('is_blocked', 'is_superuser',)})
-    )
-    add_fieldsets = (
-        ('Регистрационные данные', {
-            'fields': ('email', 'username', 'first_name', 'last_name', 'password1','password2',)
-        }),
-        ('Права доступа', {'classes': ('collapse',), 'fields': ('is_blocked', 'is_superuser',)})
-    )
-    search_fields = ('email', 'username', 'first_name', 'last_name',)
-    ordering = ('id', 'email', 'username',)
-
-
-@register(Subscribe)
-class SubscribeAdmin(ModelAdmin):
-    list_display = ('user', 'author',)
-
-    class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
 
 
 @register(ShoppingCart)

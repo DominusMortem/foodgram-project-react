@@ -1,56 +1,16 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.hashers import make_password
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import exceptions, serializers
+from rest_framework import serializers
 
-from foodgram.models import Tag, CountOfIngredient, Recipe, Ingredient, User, ShoppingCart, Subscribe
-
-INGREDIENT_MIN = 1
-COOKING_MIN = 1
-
-
-class UserSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField('is_subscribed_user')
-
-    class Meta:
-        model = User
-        fields = (
-            'id', 'email', 'username', 'first_name', 'last_name', 'password',
-            'is_subscribed',
-        )
-        extra_kwargs = {
-            'password': {'write_only': True, 'required': True},
-        }
-
-    def is_subscribed_user(self, obj):
-        user = self.context['request'].user
-        return (
-            user.is_authenticated
-            and obj.subscribing.filter(user=user).exists()
-        )
-
-    def create(self, validated_data):
-        validated_data['password'] = (
-            make_password(validated_data.pop('password'))
-        )
-        return super().create(validated_data)
-
-
-class RecipeShortReadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time',)
-
-
-class SubscriptionSerializer(UserSerializer):
-    recipes = RecipeShortReadSerializer(many=True)
-    recipes_count = serializers.SerializerMethodField()
-
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count',)
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
+from users.serializers import UserSerializer
+from .constants import COOKING_MIN_TIME, MIN_AMOUNT_COUNT
+from .models import (
+    Tag,
+    CountOfIngredient,
+    Recipe,
+    Ingredient,
+    ShoppingCart
+)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -144,7 +104,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        if attrs['cooking_time'] < COOKING_MIN:
+        if attrs['cooking_time'] < COOKING_MIN_TIME:
             raise ValidationError('Время приготовления не может быть меньше одной минуты!')
         if len(attrs['tags']) == 0:
             raise ValidationError('Рецепт не должен быть без тегов!')
@@ -154,7 +114,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise ValidationError('Ингредиенты не могут отсутствовать!')
         id_ingredients = []
         for ingredient in attrs['ingredients']:
-            if ingredient['amount'] < INGREDIENT_MIN:
+            if ingredient['amount'] < MIN_AMOUNT_COUNT:
                 raise ValidationError(
                     'Количество ингредиента не может быть меньше еденицы!'
                 )
