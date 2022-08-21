@@ -5,15 +5,15 @@ from rest_framework.routers import DefaultRouter
 from .views import TokenCreateWithCheckBlockStatusView, UserSubscribeViewSet
 
 router = DefaultRouter()
-router.register(r'users', UserSubscribeViewSet, basename='users')
+router.register('users', UserSubscribeViewSet, basename='users')
 
 authorization = [
     path(
         'token/login/',
         TokenCreateWithCheckBlockStatusView.as_view(),
-        name="login",
+        name='login',
     ),
-    path('token/logout/', TokenDestroyView.as_view(), name="logout"),
+    path('token/logout/', TokenDestroyView.as_view(), name='logout'),
 ]
 
 app_name = 'users'

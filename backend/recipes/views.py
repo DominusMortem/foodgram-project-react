@@ -14,8 +14,8 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST
 )
 
-from backend.pagination import LimitPageNumberPagination
-from backend.serializers import RecipeShortReadSerializer
+from common.pagination import LimitPageNumberPagination
+from common.serializers import RecipeShortReadSerializer
 from .mixins import ListRetriveViewSet
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -125,7 +125,7 @@ class RecipeViewSet(ModelViewSet):
             serializer.data, status=HTTP_200_OK
         )
 
-    def add_to_favorite(self, request, recipe):
+    def _add_to_favorite(self, request, recipe):
         try:
             Favorite.objects.create(user=request.user, recipe=recipe)
         except IntegrityError:
@@ -139,7 +139,7 @@ class RecipeViewSet(ModelViewSet):
             status=HTTP_201_CREATED,
         )
 
-    def delete_from_favorite(self, request, recipe):
+    def _delete_from_favorite(self, request, recipe):
         favorite = Favorite.objects.filter(user=request.user, recipe=recipe)
         if not favorite.exists():
             return Response(
@@ -157,8 +157,8 @@ class RecipeViewSet(ModelViewSet):
     def favorite(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            return self.add_to_favorite(request, recipe)
-        return self.delete_from_favorite(request, recipe)
+            return self._add_to_favorite(request, recipe)
+        return self._delete_from_favorite(request, recipe)
 
     @action(
         detail=False,

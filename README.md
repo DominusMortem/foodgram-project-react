@@ -21,4 +21,10 @@ DB_PORT=5432
 
 ## Запуск
 Запустить командную строку в директории `infra` ввести команду `docker-compose up`.
-После запуска сайт доступен по адресу `localhost/`
+После успешного запуска выполняем команды:
+```
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic --no-input
+```
+Cайт доступен по адресу `localhost/`

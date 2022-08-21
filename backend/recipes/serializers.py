@@ -3,7 +3,7 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from users.serializers import UserSerializer
-from .constants import COOKING_MIN_TIME, MIN_AMOUNT_COUNT
+from .constants import COOKING_MIN_TIME, MIN_AMOUNT_INGREDIENT
 from .models import (
     Tag,
     CountOfIngredient,
@@ -114,7 +114,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise ValidationError('Ингредиенты не могут отсутствовать!')
         id_ingredients = []
         for ingredient in attrs['ingredients']:
-            if ingredient['amount'] < MIN_AMOUNT_COUNT:
+            if ingredient['amount'] < MIN_AMOUNT_INGREDIENT:
                 raise ValidationError(
                     'Количество ингредиента не может быть меньше еденицы!'
                 )

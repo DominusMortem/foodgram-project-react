@@ -11,7 +11,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST
 )
 
-from backend.pagination import LimitPageNumberPagination
+from common.pagination import LimitPageNumberPagination
 from .models import User, Subscribe
 from .serializers import SubscriptionSerializer
 

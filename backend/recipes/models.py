@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 
 from users.models import User
-from .constants import COOKING_MIN_TIME, MIN_AMOUNT_COUNT
+from .constants import COOKING_MIN_TIME, MIN_AMOUNT_INGREDIENT
 
 
 class Tag(models.Model):
@@ -35,7 +35,7 @@ class CountOfIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
     amount = models.PositiveIntegerField(
         'Количество',
-        validators=(MinValueValidator(MIN_AMOUNT_COUNT, message='Количество ингредиента не может быть меньше еденицы!'),)
+        validators=(MinValueValidator(MIN_AMOUNT_INGREDIENT, message='Количество ингредиента не может быть меньше еденицы!'),)
     )
 
     class Meta:
