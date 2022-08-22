@@ -1,8 +1,14 @@
 from django.contrib.admin import ModelAdmin, display, register
 from django.db.models import Count, Sum
 
-from .models import (CountOfIngredient, Favorite, Ingredient, Recipe,
-                     ShoppingCart, Tag)
+from .models import (
+    CountOfIngredient,
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCart,
+    Tag
+)
 
 
 @register(Tag)
