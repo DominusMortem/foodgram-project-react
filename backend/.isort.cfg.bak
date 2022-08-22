@@ -1,3 +1,0 @@
-[settings]
-know_localfolder = [common,users,recipes]
-sections = FUTURE,STDLIB,DJANGO,THIRDPARTY,FIRSTPARTY,LOCALFOLDER
