@@ -67,8 +67,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         user = self.get_user()
         try:
             return (
-                user.is_authenticated and
-                user.shopping_cart.recipes.filter(pk__in=(obj.pk,)).exists()
+                    user.is_authenticated
+                    and user.shopping_cart.recipes.filter(
+                        pk__in=(obj.pk,)
+                    ).exists()
             )
         except ShoppingCart.DoesNotExist:
             return False
@@ -92,20 +94,27 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'cooking_time': {
                 'error_messages': {
-                    'min_value': 'Время приготовления не может быть меньше одной минуты!',
+                    'min_value': ('Время приготовления не '
+                                  'может быть меньше одной минуты!'),
                 }
             }
         }
 
     def validate(self, attrs):
         if attrs['cooking_time'] < COOKING_MIN_TIME:
-            raise ValidationError('Время приготовления не может быть меньше одной минуты!')
+            raise serializers.ValidationError(
+                'Время приготовления не может быть меньше одной минуты!'
+            )
         if len(attrs['tags']) == 0:
-            raise ValidationError('Рецепт не должен быть без тегов!')
+            raise serializers.ValidationError(
+                'Рецепт не должен быть без тегов!'
+            )
         if len(attrs['tags']) > len(set(attrs['tags'])):
-            raise ValidationError('Теги не должны повторяться!')
+            raise serializers.ValidationError('Теги не должны повторяться!')
         if len(attrs['ingredients']) == 0:
-            raise ValidationError('Ингредиенты не могут отсутствовать!')
+            raise serializers.ValidationError(
+                'Ингредиенты не могут отсутствовать!'
+            )
         id_ingredients = []
         for ingredient in attrs['ingredients']:
             if ingredient['amount'] < MIN_AMOUNT_INGREDIENT:
@@ -114,7 +123,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 )
             id_ingredients.append(ingredient['ingredient']['id'])
         if len(id_ingredients) > len(set(id_ingredients)):
-            raise ValidationError('Ингредиенты не должны повторяться!')
+            raise serializers.ValidationError(
+                'Ингредиенты не должны повторяться!'
+            )
         return attrs
 
     def add_ingredients_and_tags(self, instance, validated_data):
@@ -123,7 +134,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         )
         for ingredient in ingredients:
             count_of_ingredient, _ = CountOfIngredient.objects.get_or_create(
-                ingredient=get_object_or_404(Ingredient, pk=ingredient['ingredient']['id']),
+                ingredient=get_object_or_404(
+                    Ingredient,
+                    pk=ingredient['ingredient']['id']
+                ),
                 amount=ingredient['amount'],
             )
             instance.ingredients.add(count_of_ingredient)

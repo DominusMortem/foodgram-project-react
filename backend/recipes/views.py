@@ -28,6 +28,9 @@ from common.pagination import LimitPageNumberPagination
 from common.serializers import RecipeShortReadSerializer
 
 
+FILE_NAME = 'shopping_cart.txt'
+
+
 class TagViewSet(ListRetriveViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
@@ -50,11 +53,14 @@ class ShoppingCartViewSet(ModelViewSet):
     @action(methods=('post', 'delete',), detail=True)
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
-        shopping_cart, *_ = ShoppingCart.objects.get_or_create(user=request.user)
+        shopping_cart, *_ = ShoppingCart.objects.get_or_create(
+            user=request.user
+        )
         if request.method == 'DELETE':
             if not shopping_cart.recipes.filter(pk__in=(recipe.pk,)).exists():
                 return Response(
-                    {'error': 'Нельзя удалить рецепт, которого нет в списке покупок!'},
+                    {'error': ('Нельзя удалить рецепт, '
+                               'которого нет в списке покупок!')},
                     status=HTTP_400_BAD_REQUEST,
                 )
             shopping_cart.recipes.remove(recipe)
@@ -163,7 +169,9 @@ class RecipeViewSet(ModelViewSet):
     def download_shopping_cart(self, request):
         try:
             recipes = (
-                request.user.shopping_cart.recipes.prefetch_related('ingredients')
+                request.user.shopping_cart.recipes.prefetch_related(
+                    'ingredients'
+                )
             )
             ingredients = (
                 recipes.order_by('ingredients__ingredient__name').values(
@@ -183,10 +191,11 @@ class RecipeViewSet(ModelViewSet):
             content += (
                 f'{i}) {ingredient["ingredients__ingredient__name"]} '
                 f' — {ingredient["total"]}'
-                f' {ingredient["ingredients__ingredient__measurement_unit"]}\r\n'
+                f' {ingredient["ingredients__ingredient__measurement_unit"]}'
+                f'\r\n'
             )
         response = HttpResponse(
             content, content_type='text/plain,charset=utf8'
         )
-        response['Content-Disposition'] = f'attachment; filename=shopping_cart.txt'
+        response['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
         return response

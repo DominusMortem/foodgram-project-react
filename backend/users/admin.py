@@ -21,13 +21,26 @@ class UserAdmin(UserAdmin):
         ('Общая информация', {'fields': (
             'email', 'username', 'first_name', 'last_name', 'password',
         )}),
-        ('Права доступа', {'classes': ('collapse',), 'fields': ('is_blocked', 'is_superuser',)})
+        ('Права доступа', {'classes': ('collapse',), 'fields': (
+            'is_blocked',
+            'is_superuser',
+        )})
     )
     add_fieldsets = (
         ('Регистрационные данные', {
-            'fields': ('email', 'username', 'first_name', 'last_name', 'password1','password2',)
+            'fields': (
+                'email',
+                'username',
+                'first_name',
+                'last_name',
+                'password1',
+                'password2',
+            )
         }),
-        ('Права доступа', {'classes': ('collapse',), 'fields': ('is_blocked', 'is_superuser',)})
+        ('Права доступа', {'classes': ('collapse',), 'fields': (
+            'is_blocked',
+            'is_superuser',
+        )})
     )
     search_fields = ('email', 'username', 'first_name', 'last_name',)
     ordering = ('id', 'email', 'username',)

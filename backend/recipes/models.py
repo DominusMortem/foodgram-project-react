@@ -6,7 +6,7 @@ from users.models import User
 
 
 class Tag(models.Model):
-    name = models.CharField('Название',max_length=30)
+    name = models.CharField('Название', max_length=30)
     color = models.CharField('Цвет', max_length=7)
     slug = models.SlugField(max_length=30)
 
@@ -32,10 +32,19 @@ class Ingredient(models.Model):
 
 
 class CountOfIngredient(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        verbose_name='Ингредиент'
+    )
     amount = models.PositiveIntegerField(
         'Количество',
-        validators=(MinValueValidator(MIN_AMOUNT_INGREDIENT, message='Количество ингредиента не может быть меньше еденицы!'),)
+        validators=(
+            MinValueValidator(
+                MIN_AMOUNT_INGREDIENT,
+                message='Количество ингредиента не может быть меньше еденицы!'
+            ),
+        ),
     )
 
     class Meta:
@@ -65,11 +74,25 @@ class Recipe(models.Model):
     name = models.CharField('Название', max_length=200)
     image = models.ImageField('Картинка')
     text = models.TextField('Описание')
-    ingredients = models.ManyToManyField(CountOfIngredient, related_name='recipes', verbose_name='Ингредиенты')
-    tags = models.ManyToManyField(Tag, related_name='recipes', verbose_name='Теги')
+    ingredients = models.ManyToManyField(
+        CountOfIngredient,
+        related_name='recipes',
+        verbose_name='Ингредиенты'
+    )
+    tags = models.ManyToManyField(
+        Tag,
+        related_name='recipes',
+        verbose_name='Теги'
+    )
     cooking_time = models.PositiveIntegerField(
         'Время готовки',
-        validators=(MinValueValidator(COOKING_MIN_TIME, message='Время приготовления не может быть меньше одной минуты!',),)
+        validators=(
+            MinValueValidator(
+                COOKING_MIN_TIME,
+                message=('Время приготовления не '
+                         'может быть меньше одной минуты!'),
+            ),
+        )
     )
 
     class Meta:

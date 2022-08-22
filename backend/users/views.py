@@ -6,9 +6,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND
 )
 
 from .models import Subscribe, User
@@ -65,10 +67,15 @@ class UserSubscribeViewSet(UserViewSet):
 
     def delete_subscribe(self, request, author):
         try:
-            get_object_or_404(Subscribe, user=request.user, author=author).delete()
+            get_object_or_404(
+                Subscribe,
+                user=request.user,
+                author=author
+            ).delete()
         except Subscribe.DoesNotExist:
             return Response(
-                {'error': 'Нельзя отписаться от пользователя, на которого не подписан.'},
+                {'error': ('Нельзя отписаться от пользователя, '
+                           'на которого не подписан.')},
                 status=HTTP_400_BAD_REQUEST,
             )
         return Response(
