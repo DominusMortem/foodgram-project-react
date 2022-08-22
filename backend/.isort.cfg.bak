@@ -3,4 +3,4 @@ default_section=THIRDPARTY
 known_local_folder = common,users,recipes
 sections = FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER
 multi_line_output=3
-no_lines_before=LOCALFOLDER
+no_lines_before=THIRDPARTY, LOCALFOLDER
