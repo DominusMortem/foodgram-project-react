@@ -27,7 +27,6 @@ from .serializers import (
 from common.pagination import LimitPageNumberPagination
 from common.serializers import RecipeShortReadSerializer
 
-
 FILE_NAME = 'shopping_cart.txt'
 
 

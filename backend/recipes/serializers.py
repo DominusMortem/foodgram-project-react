@@ -32,7 +32,9 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
 class RecipeIngredientReadSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit'
+    )
 
     class Meta:
         model = CountOfIngredient
@@ -67,8 +69,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         user = self.get_user()
         try:
             return (
-                    user.is_authenticated
-                    and user.shopping_cart.recipes.filter(
+                    user.is_authenticated and
+                    user.shopping_cart.recipes.filter(
                         pk__in=(obj.pk,)
                     ).exists()
             )
@@ -118,7 +120,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         id_ingredients = []
         for ingredient in attrs['ingredients']:
             if ingredient['amount'] < MIN_AMOUNT_INGREDIENT:
-                raise ValidationError(
+                raise serializers.ValidationError(
                     'Количество ингредиента не может быть меньше еденицы!'
                 )
             id_ingredients.append(ingredient['ingredient']['id'])
