@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from common.serializers import RecipeShortReadSerializer
-from .models import User, Subscribe
+from .models import Subscribe, User
 
 
 class UserSerializer(serializers.ModelSerializer):

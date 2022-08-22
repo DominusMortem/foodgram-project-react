@@ -2,12 +2,12 @@ from django.contrib.admin import ModelAdmin, display, register
 from django.db.models import Count, Sum
 
 from .models import (
-    Tag,
     CountOfIngredient,
-    Recipe,
+    Favorite,
     Ingredient,
+    Recipe,
     ShoppingCart,
-    Favorite
+    Tag
 )
 
 

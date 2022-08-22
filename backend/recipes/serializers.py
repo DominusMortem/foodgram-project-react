@@ -4,13 +4,7 @@ from rest_framework import serializers
 
 from users.serializers import UserSerializer
 from .constants import COOKING_MIN_TIME, MIN_AMOUNT_INGREDIENT
-from .models import (
-    Tag,
-    CountOfIngredient,
-    Recipe,
-    Ingredient,
-    ShoppingCart
-)
+from .models import CountOfIngredient, Ingredient, Recipe, ShoppingCart, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):

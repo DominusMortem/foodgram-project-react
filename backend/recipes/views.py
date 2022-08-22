@@ -1,8 +1,7 @@
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 from django.db import IntegrityError
-from django.db.models import Count, Sum
-from rest_framework.viewsets import ModelViewSet
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -13,20 +12,20 @@ from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST
 )
+from rest_framework.viewsets import ModelViewSet
 
 from common.pagination import LimitPageNumberPagination
 from common.serializers import RecipeShortReadSerializer
-from .mixins import ListRetriveViewSet
-from .permissions import IsAuthorOrAdminOrReadOnly
 from .filters import IngredientSearchFilter, RecipeFilter
+from .mixins import ListRetriveViewSet
 from .models import (
-    Tag,
-    CountOfIngredient,
-    Recipe,
+    Favorite,
     Ingredient,
+    Recipe,
     ShoppingCart,
-    Favorite
+    Tag
 )
+from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (
     IngredientSerializer,
     RecipeReadSerializer,
@@ -44,6 +43,7 @@ class TagViewSet(ListRetriveViewSet):
 class IngredientViewSet(ListRetriveViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientSearchFilter
     queryset = Ingredient.objects.all()
     http_method_names = ('get',)
 
