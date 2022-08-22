@@ -1,10 +1,7 @@
 from django.db.models import IntegerField, Value
-from django_filters.rest_framework import (
-    AllValuesMultipleFilter,
-    BooleanFilter,
-    CharFilter,
-    FilterSet
-)
+from django_filters.rest_framework import (AllValuesMultipleFilter,
+                                           BooleanFilter, CharFilter,
+                                           FilterSet)
 
 from .models import Ingredient, Recipe, ShoppingCart
 

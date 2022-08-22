@@ -1,8 +1,8 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from users.models import User
 from .constants import COOKING_MIN_TIME, MIN_AMOUNT_INGREDIENT
+from users.models import User
 
 
 class Tag(models.Model):

@@ -2,9 +2,9 @@ from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from users.serializers import UserSerializer
 from .constants import COOKING_MIN_TIME, MIN_AMOUNT_INGREDIENT
 from .models import CountOfIngredient, Ingredient, Recipe, ShoppingCart, Tag
+from users.serializers import UserSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
