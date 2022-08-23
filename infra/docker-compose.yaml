@@ -36,8 +36,11 @@ services:
     restart: always
     depends_on:
       - frontend
-     
+
+
 volumes:
-  postgres_data:
   static_value:
   media_value:
+  result_build:
+  postgres_data:
+  redoc:
