@@ -37,8 +37,9 @@ class CountOfIngredient(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.DecimalField(
         'Количество',
+        max_decimal_places=1,
         validators=(
             MinValueValidator(
                 MIN_AMOUNT_INGREDIENT,
