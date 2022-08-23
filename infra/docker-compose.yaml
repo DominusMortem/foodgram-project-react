@@ -13,7 +13,7 @@ services:
     env_file:
       - ./.env
   backend:
-    image: poh9shka/foodgram_backend:latest
+    image: dmortem/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static_backend/
@@ -23,7 +23,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: poh9shka/foodgram_frontend:latest
+    image: dmortem/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
