@@ -42,7 +42,7 @@ class CountOfIngredient(models.Model):
         validators=(
             MinValueValidator(
                 MIN_AMOUNT_INGREDIENT,
-                message='Количество ингредиента не может быть меньше еденицы!'
+                message='Количество ингредиента должно быть больше 0!'
             ),
         ),
     )
@@ -122,7 +122,7 @@ class ShoppingCart(models.Model):
         verbose_name_plural = 'Списки покупок'
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 class Favorite(models.Model):

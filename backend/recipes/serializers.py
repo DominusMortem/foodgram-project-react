@@ -119,7 +119,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         for ingredient in attrs['ingredients']:
             if ingredient['amount'] < MIN_AMOUNT_INGREDIENT:
                 raise serializers.ValidationError(
-                    'Количество ингредиента не может быть меньше еденицы!'
+                    'Количество ингредиента должно быть больше 0!'
                 )
             id_ingredients.append(ingredient['ingredient']['id'])
         if len(id_ingredients) > len(set(id_ingredients)):
