@@ -56,3 +56,9 @@ docker-compose exec web python manage.py loaddata fixtures.json
 Документация доступна на сервере:
 [http://84.252.142.183/api/docs/](http://84.252.142.183/api/docs/)
 
+## Доступ к админке
+
+[http://84.252.142.183/admin/](http://84.252.142.183/admin/)
+почта: test@test.test
+пароль: admin12345
+
