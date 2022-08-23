@@ -18,6 +18,7 @@ services:
     volumes:
       - static_value:/app/static_backend/
       - media_value:/app/media/
+      - /docs/:/app/docs/
     depends_on:
       - db
     env_file:
