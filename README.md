@@ -48,17 +48,4 @@ docker-compose exec web python manage.py collectstatic --no-input
 docker-compose exec web python manage.py loaddata fixtures.json
 ```
 
-## Сайт
-Сайт доступен по ссылке:
-[http://84.252.142.183/](http://84.252.142.183/)
-
-## Документация к API
-Документация доступна на сервере:
-[http://84.252.142.183/api/docs/](http://84.252.142.183/api/docs/)
-
-## Доступ к админке
-
-[http://84.252.142.183/admin/](http://84.252.142.183/admin/)
-почта: test@test.test
-пароль: admin12345
 
